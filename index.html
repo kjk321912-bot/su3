@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>전자회로: FET 완전 정복 (슬라이드 학습)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --text-color: #333;
+            --bg-color: #f0f2f5;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden; /* 전체 스크롤 방지 */
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 { margin: 0; font-size: 1.2rem; }
+        header .info { font-size: 0.9rem; opacity: 0.9; text-align: right; }
+
+        /* Main Slide Container */
+        .slide-container {
+            flex-grow: 1;
+            position: relative;
+            padding: 20px;
+            overflow-y: auto; /* 내용이 길면 내부 스크롤 */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .slide {
+            background: white;
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            display: none; /* 기본적으로 숨김 */
+            animation: fadeIn 0.5s;
+        }
+
+        .slide.active {
+            display: block; /* 활성화된 슬라이드만 표시 */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Content Styles */
+        h2 { color: var(--primary-color); border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; }
+        .highlight { background-color: #fff3cd; padding: 2px 5px; border-radius: 3px; }
+        
+        .analogy-box {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+            border: 1px dashed #ccc;
+        }
+        .emoji-icon { font-size: 3rem; display: block; margin-bottom: 10px; }
+
+        textarea {
+            width: 100%;
+            height: 80px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        /* Quiz Styles */
+        .quiz-options button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+        }
+        .quiz-options button:hover { background-color: #f1f1f1; }
+        .quiz-feedback { margin-top: 10px; font-weight: bold; display: none; }
+
+        /* Table */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9rem; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        th { background-color: #f8f9fa; color: #333; }
+
+        /* Footer Navigation */
+        footer {
+            background: white;
+            padding: 15px 20px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .progress-bar-bg {
+            flex-grow: 1;
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            margin: 0 20px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--secondary-color);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .nav-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            min-width: 100px;
+        }
+        .nav-btn:disabled { background-color: #ccc; cursor: not-allowed; }
+        .nav-btn:hover:not(:disabled) { opacity: 0.9; transform: scale(1.05); }
+
+        /* Video Responsive */
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <h1>⚡ 전자회로: FET 정복하기</h1>
+    </div>
+    <div class="info">
+        👨‍🏫 지도교사: 김진경 선생님<br>
+        🏫 전기전자제어과 2학년
+    </div>
+</header>
+
+<div class="slide-container">
+
+    <!-- Slide 1: Cover -->
+    <div class="slide active">
+        <div style="text-align: center; margin-top: 50px;">
+            <span style="font-size: 4rem;">📱</span>
+            <h1 style="color: #333; margin-top: 20px;">전계 효과 트랜지스터(FET)<br>동작 원리와 특징</h1>
+            <p style="font-size: 1.2rem; color: #666;">학생 주도형 인터랙티브 수업</p>
+            <div style="margin-top: 40px; padding: 20px; background: #e8f4fd; border-radius: 10px; display: inline-block;">
+                <strong>학습 목표</strong><br>
+                1. FET의 동작 원리를 설명할 수 있다.<br>
+                2. FET의 특징과 종류를 설명할 수 있다.
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 2: Motivation -->
+    <div class="slide">
+        <h2>🤔 생각 열기</h2>
+        <p>반도체가 없다면 컴퓨터는 등장할 수 있었을까요? <br>
+        0과 1의 디지털 신호를 처리하는 컴퓨터, 그 핵심에는 <strong>반도체</strong>가 있습니다.</p>
+        <div class="analogy-box">
+            <span class="emoji-icon">🧩</span>
+            <p>오늘날의 컴퓨터는 수십억 개의 <strong>스위치</strong>로 이루어져 있습니다.<br>그 스위치가 바로 트랜지스터입니다.</p>
+        </div>
+        <p>오늘 우리는 논리 회로 작동에 최적화된 반도체, <strong>FET(전계 효과 트랜지스터)</strong>에 대해 알아봅니다.</p>
+    </div>
+
+    <!-- Slide 3: Video -->
+    <div class="slide">
+        <h2>📺 영상으로 만나는 반도체</h2>
+        <p>본격적인 학습 전에, 반도체 소자가 어떤 역할을 하는지 알아볼까요?</p>
+        <div class="video-container">
+            <iframe src="https://www.youtube.com/embed/jJj82n0Q01I" frameborder="0" allowfullscreen></iframe>
+        </div>
+        <p style="font-size: 0.8rem; text-align: center; color: #888;">영상 출처: 유튜브 (반도체의 기초)</p>
+    </div>
+
+    <!-- Slide 4: Student Input -->
+    <div class="slide">
+        <h2>✍️ 스스로 질문하기 (NCS 연계)</h2>
+        <div style="background: #fff8e1; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+            <strong>Q1. 컴퓨터에 사용되는 반도체는 용도별로 무엇이 있을까요?</strong><br>
+            <strong>Q2. 반도체 기술 개발에 기여한 한국인은 누가 있을까요?</strong>
+        </div>
+        <p>여러분의 배경지식을 활용해 답을 적어보세요.</p>
+        <textarea placeholder="여기에 여러분의 생각을 자유롭게 적어보세요..."></textarea>
+    </div>
+
+    <!-- Slide 5: Concept -->
+    <div class="slide">
+        <h2>1. 전계 효과 트랜지스터(FET)란?</h2>
+        <p><strong>FET</strong>는 <strong>Field Effect Transistor</strong>의 약자입니다.</p>
+        <ul>
+            <li>✨ <strong>전계(Field Effect):</strong> 전압을 걸어 전기장(Electric Field)을 만들고, 이 힘으로 전류를 조절합니다.</li>
+            <li>📏 <strong>특징:</strong> 기존 BJT(접합 트랜지스터)보다 훨씬 작게 만들 수 있고, 전력 소모가 매우 적습니다.</li>
+            <li>🏭 <strong>용도:</strong> CPU, RAM 같은 고집적 IC의 핵심 부품입니다.</li>
+        </ul>
+    </div>
+
+    <!-- Slide 6: Classification -->
+    <div class="slide">
+        <h2>🌳 트랜지스터의 분류</h2>
+        <p>트랜지스터는 구동 방식에 따라 크게 두 가지로 나뉩니다.</p>
+        <div style="display: flex; gap: 10px;">
+            <div style="flex: 1; border: 1px solid #ddd; padding: 15px; border-radius: 10px; background: #f9f9f9;">
+                <h3 style="color: #e74c3c; text-align: center;">양극성 (BJT)</h3>
+                <p style="text-align: center;">NPN형, PNP형<br><strong>전류</strong>로 제어</p>
+            </div>
+            <div style="flex: 1; border: 2px solid var(--primary-color); padding: 15px; border-radius: 10px; background: #fff;">
+                <h3 style="color: var(--primary-color); text-align: center;">단극성 (FET)</h3>
+                <p style="text-align: center;">JFET, MOSFET<br><strong>전압</strong>으로 제어</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 7: Quiz 1 -->
+    <div class="slide">
+        <h2>🧠 퀴즈 TIME (1)</h2>
+        <div class="quiz-box" id="quiz1">
+            <p><strong>Q. FET는 무엇에 의해 전류가 조절되는 소자입니까?</strong></p>
+            <div class="quiz-options">
+                <button onclick="checkAnswer(this, false)">1. 전류 (Current)</button>
+                <button onclick="checkAnswer(this, true)">2. 전압 (Voltage/전기장)</button>
+                <button onclick="checkAnswer(this, false)">3. 빛 (Light)</button>
+            </div>
+            <div class="quiz-feedback"></div>
+        </div>
+    </div>
+
+    <!-- Slide 8: Terminals -->
+    <div class="slide">
+        <h2>🆚 BJT vs FET 단자 이름</h2>
+        <p>두 트랜지스터는 역할은 비슷하지만 부르는 이름이 다릅니다.</p>
+        <table>
+            <tr style="background: #eee;">
+                <th>역할</th>
+                <th>BJT</th>
+                <th>FET</th>
+            </tr>
+            <tr>
+                <td>입력 조절</td>
+                <td>베이스 (Base)</td>
+                <td style="font-weight: bold; color: var(--primary-color);">게이트 (Gate)</td>
+            </tr>
+            <tr>
+                <td>입구 (공급)</td>
+                <td>이미터 (Emitter)</td>
+                <td style="font-weight: bold; color: var(--primary-color);">소스 (Source)</td>
+            </tr>
+            <tr>
+                <td>출구 (배출)</td>
+                <td>컬렉터 (Collector)</td>
+                <td style="font-weight: bold; color: var(--primary-color);">드레인 (Drain)</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Slide 9: Analogy -->
+    <div class="slide">
+        <h2>🚰 수도꼭지 비유 (핵심!)</h2>
+        <p>FET의 동작 원리는 수도꼭지를 생각하면 가장 쉽습니다.</p>
+        <div class="analogy-box">
+            <span class="emoji-icon">🚰</span>
+            <div style="text-align: left; display: inline-block;">
+                <strong>1. 소스(Source):</strong> 수도관 입구 (물 공급)<br>
+                <strong>2. 드레인(Drain):</strong> 수도관 출구 (물 배출)<br>
+                <strong>3. 게이트(Gate):</strong> 수도꼭지 손잡이 (물 양 조절)
+            </div>
+        </div>
+        <p class="highlight" style="text-align: center;">게이트(손잡이)에 전압을 가하면,<br>소스에서 드레인으로 흐르는 전류가 조절됩니다.</p>
+    </div>
+
+    <!-- Slide 10: JFET Structure -->
+    <div class="slide">
+        <h2>2. 접합형 FET (JFET)</h2>
+        <p>가장 기본적인 형태인 JFET입니다.</p>
+        <ul>
+            <li>채널(통로)과 게이트 사이에 <strong>PN 접합</strong>이 있습니다.</li>
+            <li>게이트에 <strong>역방향 전압</strong>을 걸어줍니다.</li>
+            <li>그러면 <strong>공핍 영역(Depletion Region)</strong>이 넓어지면서 전자가 지나가는 길(채널)이 좁아집니다.</li>
+        </ul>
+        <div style="text-align: center; color: #888; font-size: 0.8rem;">(교과서 그림 II-13 참조)</div>
+    </div>
+
+    <!-- Slide 11: Pinch Off -->
+    <div class="slide">
+        <h2>🚫 핀치 오프 (Pinch-off)</h2>
+        <p>수도꼭지를 꽉 잠그면 물이 안 나오죠?</p>
+        <div class="analogy-box">
+            <span class="emoji-icon">🤏 🚿</span>
+            <p>게이트 전압을 높여서 공핍 영역이 만나<br><strong>채널이 완전히 막히는 현상</strong></p>
+        </div>
+        <p>이 상태를 <strong>핀치 오프(Pinch-off)</strong>라고 하며, 이때의 전압을 $V_P$라고 합니다.</p>
+    </div>
+
+    <!-- Slide 12: Quiz 2 -->
+    <div class="slide">
+        <h2>🧠 퀴즈 TIME (2)</h2>
+        <div class="quiz-box" id="quiz2">
+            <p><strong>Q. JFET에서 게이트 전압에 의해 채널이 막혀 전류가 흐르지 않게 되는 현상은?</strong></p>
+            <div class="quiz-options">
+                <button onclick="checkAnswer(this, false)">1. 쇼트 (Short)</button>
+                <button onclick="checkAnswer(this, true)">2. 핀치 오프 (Pinch-off)</button>
+                <button onclick="checkAnswer(this, false)">3. 도핑 (Doping)</button>
+            </div>
+            <div class="quiz-feedback"></div>
+        </div>
+    </div>
+
+    <!-- Slide 13: MOSFET Intro -->
+    <div class="slide">
+        <h2>3. MOSFET의 등장</h2>
+        <p>현대 반도체의 주인공, <strong>MOSFET (금속-산화물-반도체 FET)</strong>입니다.</p>
+        <div style="border: 2px solid #ddd; padding: 10px; border-radius: 10px; margin: 10px 0;">
+            <ul>
+                <li><strong>Metal (금속):</strong> 게이트 전극</li>
+                <li><strong>Oxide (산화물):</strong> $SiO_2$ (유리 같은 절연체)</li>
+                <li><strong>Semiconductor (반도체):</strong> 실리콘 기판</li>
+            </ul>
+        </div>
+        <p>✨ <strong>핵심:</strong> 게이트와 채널 사이에 <strong>절연체(산화막)</strong>가 있어서 게이트로는 전류가 거의 흐르지 않습니다. (입력 저항이 매우 큼)</p>
+    </div>
+
+    <!-- Slide 14: Depletion vs Enhancement -->
+    <div class="slide">
+        <h2>공핍형 vs 증가형</h2>
+        <p>MOSFET은 두 가지 모드가 있습니다.</p>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <div style="flex: 1; background: #e3f2fd; padding: 10px; border-radius: 8px;">
+                <strong>공핍형 (D-Type)</strong><br>
+                원래 길이 뚫려 있음<br>
+                (Normal ON)
+            </div>
+            <div style="flex: 1; background: #fff3e0; padding: 10px; border-radius: 8px;">
+                <strong>증가형 (E-Type)</strong><br>
+                평소엔 막혀 있음<br>
+                (Normal OFF)<br>
+                <span style="font-size: 0.8rem; color: #e67e22;">★ 주로 사용됨</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 15: Threshold Voltage -->
+    <div class="slide">
+        <h2>🚪 문턱 전압 ($V_{TH}$)</h2>
+        <p>증가형(E-type) MOSFET을 켜려면 어떻게 해야 할까요?</p>
+        <div class="analogy-box">
+            <span class="emoji-icon">🚧</span>
+            <p>어느 정도 이상의 전압을 가해야<br>닫혀있던 문(채널)이 열립니다.</p>
+        </div>
+        <p>전류가 흐르기 시작하게 하는 최소한의 게이트 전압을 <strong>문턱 전압(Threshold Voltage)</strong>이라고 합니다.</p>
+    </div>
+
+    <!-- Slide 16: Quiz 3 -->
+    <div class="slide">
+        <h2>🧠 퀴즈 TIME (3)</h2>
+        <div class="quiz-box" id="quiz3">
+            <p><strong>Q. MOSFET 구조에서 게이트와 채널 사이를 막아주는 절연막의 재료는?</strong></p>
+            <div class="quiz-options">
+                <button onclick="checkAnswer(this, false)">1. 구리 (Cu)</button>
+                <button onclick="checkAnswer(this, true)">2. 산화 실리콘 ($SiO_2$)</button>
+                <button onclick="checkAnswer(this, false)">3. 플라스틱</button>
+            </div>
+            <div class="quiz-feedback"></div>
+        </div>
+    </div>
+
+    <!-- Slide 17: CMOS Structure -->
+    <div class="slide">
+        <h2>4. CMOS란 무엇인가?</h2>
+        <p><strong>CMOS (Complementary MOS)</strong>는 '상보형'이라는 뜻입니다. 서로 반대되는 친구들이 짝을 이뤘다는 뜻이죠.</p>
+        <h3 style="text-align: center; background: #f0f0f0; padding: 10px; border-radius: 50px;">NMOS + PMOS = CMOS</h3>
+        <p>N채널과 P채널 FET를 하나의 칩 안에 같이 만든 구조입니다. 현대 디지털 회로의 99%는 이 기술을 씁니다.</p>
+    </div>
+
+    <!-- Slide 18: CMOS Advantage -->
+    <div class="slide">
+        <h2>🔋 CMOS를 쓰는 이유</h2>
+        <p>왜 세상 모든 칩이 CMOS일까요?</p>
+        <ul>
+            <li>NMOS가 켜지면 PMOS는 꺼지고, 반대로도 작동합니다.</li>
+            <li>둘 중 하나는 항상 꺼져 있기 때문에...</li>
+        </ul>
+        <div class="analogy-box">
+            <span class="emoji-icon">⚡📉</span>
+            <p><strong>전력 소모가 극도로 적습니다!</strong><br>배터리를 오래 쓰게 해주는 일등 공신입니다.</p>
+        </div>
+    </div>
+
+    <!-- Slide 19: Summary -->
+    <div class="slide">
+        <h2>📝 핵심 정리: BJT vs FET</h2>
+        <p>교과서의 내용을 한 눈에 비교해 봅시다.</p>
+        <table style="font-size: 0.8rem;">
+            <thead>
+                <tr>
+                    <th>구분</th>
+                    <th>BJT</th>
+                    <th>FET</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>제어</td>
+                    <td>전류 제어 ($I_B$)</td>
+                    <td><strong>전압 제어 ($V_{GS}$)</strong></td>
+                </tr>
+                <tr>
+                    <td>캐리어</td>
+                    <td>전자 + 정공 (양극성)</td>
+                    <td>전자 or 정공 (단극성)</td>
+                </tr>
+                <tr>
+                    <td>특징</td>
+                    <td>속도가 빠름</td>
+                    <td><strong>작고, 전력소모 적음</strong></td>
+                </tr>
+                <tr>
+                    <td>용도</td>
+                    <td>아날로그 증폭</td>
+                    <td><strong>디지털 회로, CPU</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Slide 20: Final Quiz -->
+    <div class="slide">
+        <h2>🎓 최종 점검</h2>
+        <div class="quiz-box" id="quiz4">
+            <p><strong>Q. 디지털 기기(스마트폰 등)에서 전력 소모를 줄이기 위해 NMOS와 PMOS를 결합한 회로 기술은?</strong></p>
+            <div class="quiz-options">
+                <button onclick="checkAnswer(this, false)">1. TTL</button>
+                <button onclick="checkAnswer(this, true)">2. CMOS</button>
+                <button onclick="checkAnswer(this, false)">3. ECL</button>
+            </div>
+            <div class="quiz-feedback"></div>
+        </div>
+    </div>
+
+    <!-- Slide 21: Conclusion -->
+    <div class="slide">
+        <h2>🎉 수업을 마치며</h2>
+        <p>오늘 FET와 CMOS에 대해 열심히 공부했습니다.</p>
+        <p><strong>[학습 정리]</strong> 오늘 배운 단어 중 기억에 남는 3가지를 적어주세요.</p>
+        <textarea placeholder="예: MOSFET, 핀치오프, CMOS..."></textarea>
+        <div style="margin-top: 30px; text-align: center;">
+            <p>작성한 내용을 캡처하여 김진경 선생님께 제출하세요!</p>
+            <button class="nav-btn" onclick="alert('수고했습니다! 창을 닫거나 캡처하세요.')">학습 종료</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- Footer Navigation -->
+<footer>
+    <button id="prevBtn" class="nav-btn" onclick="changeSlide(-1)">이전</button>
+    
+    <div class="progress-bar-bg">
+        <div id="progressBar" class="progress-bar-fill"></div>
+    </div>
+    <span id="pageIndicator" style="font-weight: bold; min-width: 60px; text-align: center;">1 / 21</span>
+
+    <button id="nextBtn" class="nav-btn" onclick="changeSlide(1)">다음</button>
+</footer>
+
+<script>
+    let currentSlideIndex = 0;
+    const slides = document.querySelectorAll('.slide');
+    const progressBar = document.getElementById('progressBar');
+    const pageIndicator = document.getElementById('pageIndicator');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    function showSlide(index) {
+        if (index < 0 || index >= slides.length) return;
+
+        // Hide all slides
+        slides.forEach(slide => slide.classList.remove('active'));
+
+        // Show target slide
+        slides[index].classList.add('active');
+        currentSlideIndex = index;
+
+        // Update UI
+        updateProgress();
+        updateButtons();
+        
+        // Scroll to top of slide container
+        document.querySelector('.slide-container').scrollTop = 0;
+    }
+
+    function changeSlide(direction) {
+        showSlide(currentSlideIndex + direction);
+    }
+
+    function updateProgress() {
+        const percent = ((currentSlideIndex + 1) / slides.length) * 100;
+        progressBar.style.width = percent + '%';
+        pageIndicator.textContent = `${currentSlideIndex + 1} / ${slides.length}`;
+    }
+
+    function updateButtons() {
+        prevBtn.disabled = currentSlideIndex === 0;
+        
+        if (currentSlideIndex === slides.length - 1) {
+            nextBtn.textContent = "완료";
+            nextBtn.onclick = () => alert("모든 학습을 마쳤습니다. 수고했어요!");
+        } else {
+            nextBtn.textContent = "다음";
+            nextBtn.onclick = () => changeSlide(1);
+        }
+    }
+
+    // Quiz Logic
+    window.checkAnswer = function(btn, isCorrect) {
+        const parent = btn.parentElement;
+        const feedback = parent.parentElement.querySelector('.quiz-feedback');
+        const allBtns = parent.querySelectorAll('button');
+
+        // Reset styles
+        allBtns.forEach(b => {
+            b.style.background = 'white';
+            b.style.color = 'black';
+        });
+
+        if (isCorrect) {
+            btn.style.background = '#2ecc71';
+            btn.style.color = 'white';
+            feedback.innerHTML = "🎉 정답입니다!";
+            feedback.style.color = '#27ae60';
+        } else {
+            btn.style.background = '#e74c3c';
+            btn.style.color = 'white';
+            feedback.innerHTML = "😅 다시 시도해보세요.";
+            feedback.style.color = '#c0392b';
+        }
+        feedback.style.display = 'block';
+    }
+
+    // Initialize
+    showSlide(0);
+</script>
+
+</body>
+</html>
